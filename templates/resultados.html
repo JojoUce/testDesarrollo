@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de la Predicción Electoral</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 50px;
+        }
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .grafico {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chatbox {
+            border: 1px solid #007bff;
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .chatbox input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+        .btn-primary {
+            background-color: #28a745;
+            border-color: #28a745;
+            font-size: 1.1rem;
+        }
+        .btn-primary:hover {
+            background-color: #218838;
+            border-color: #1e7e34;
+        }
+        .btn-secondary {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-size: 1.1rem;
+        }
+        .btn-secondary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="header-title">Resultados de la Predicción Electoral</h1>
+
+        <!-- Gráfico de resultados -->
+        <div class="mb-4">
+            <h3 class="text-center">Distribución de Clasificación</h3>
+            <img src="{{ grafico }}" class="grafico" alt="Gráfico de Resultados">
+        </div>
+
+        <!-- Chatbox para interacción -->
+        <div class="mb-4">
+            <h3 class="text-center">Consulta Interactiva</h3>
+            <div class="chatbox" id="chatbox">
+                <p><strong>Asistente:</strong> ¡Hola! ¿En qué puedo ayudarte con respecto a los resultados?</p>
+            </div>
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje aquí..." onkeydown="if(event.key === 'Enter'){sendMessage();}">
+        </div>
+
+        <div class="text-center">
+            <a href="/" class="btn btn-secondary mt-3">Volver a la página principal</a>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const userInput = document.getElementById("userInput").value;
+            const chatbox = document.getElementById("chatbox");
+            if (userInput.trim() !== "") {
+                
+                chatbox.innerHTML += "<p><strong>Tú:</strong> " + userInput + "</p>";
+                document.getElementById("userInput").value = "";
+
+                // Enviar la pregunta al backend para que la IA la procese
+                setTimeout(async () => {
+                    const respuesta = await obtenerRespuesta(userInput); 
+                    chatbox.innerHTML += "<p><strong>Asistente:</strong> " + respuesta + "</p>";
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                }, 1000);
+                chatbox.scrollTop = chatbox.scrollHeight; 
+            }
+        }
+
+        async function obtenerRespuesta(pregunta) {
+            try {
+                // Llamada a la API del backend (puedes usar fetch para AJAX)
+                const response = await fetch('/obtener_respuesta', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ pregunta: pregunta })
+                });
+                
+                const data = await response.json();
+                return data.respuesta; // La respuesta que la IA generó
+            } catch (error) {
+                return "Lo siento, ocurrió un error al procesar tu pregunta.";
+            }
+        }
+    </script>
+</body>
+</html>
